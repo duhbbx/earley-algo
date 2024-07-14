@@ -1,0 +1,20 @@
+{
+  "name": "earley-algo",
+  "version": "1.0.0",
+  "description": "学习下earley算法",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/recogniser.js",
+    "dev": "ts-node src/recogniser.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  }
+}
