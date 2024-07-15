@@ -1,18 +1,13 @@
-// Usage: just execute `tsc recogniser.ts && node recogniser.js` in the command line.
-
-// Prerequisites: imperative programming and basic knowledge of Earley
-// parsing. The tutorial at
-//   <http://loup-vaillant.fr/tutorials/earley-parsing/>
-// is highly recommended.
-
 interface EarleyItem {
-    rule: number;
-    next: number;
-    start: number;
+    rule: number;   // 语法规则在语法中的索引
+    next: number;   // 规则中下一个要处理的符号的索引
+    start: number;  // 输入中规则开始应用的位置
 }
 
 interface GrammarRule {
     name: string;
+
+    // ts 太牛逼了,这种类型也可以定义吗
     [index: number]: string | ((input: string, index: number) => boolean);
 }
 
@@ -29,8 +24,11 @@ const earleyItem = (rule: number, next: number, start: number): EarleyItem => ({
     start
 });
 
+
+// 这个是定义的规则
 const exampleGrammar: Grammar = {
-    start_rule_name: 'Sum',
+    
+    start_rule_name: 'Sum', // 起始的规则名称是 Sum
     0: { name: 'Sum', 0: 'Sum', 1: classSymbol('+-'), 2: 'Product' },
     1: { name: 'Sum', 0: 'Product' },
     2: { name: 'Product', 0: 'Product', 1: classSymbol('*/'), 2: 'Factor' },
@@ -62,7 +60,7 @@ function nextSymbol(grammar: Grammar, item: EarleyItem): string | ((input: strin
     return grammar[item.rule][item.next];
 }
 
-function name(grammar: Grammar, item: EarleyItem): string {
+function getRuleName(grammar: Grammar, item: EarleyItem): string {
     return (grammar[item.rule] as GrammarRule).name;
 }
 
@@ -80,7 +78,7 @@ function append(set: EarleyItem[], item: EarleyItem): void {
 function complete(S: EarleySet, i: number, j: number, grammar: Grammar): void {
     const item = S[i][j];
     for (const oldItem of S[item.start]) {
-        if (nextSymbol(grammar, oldItem) === name(grammar, item)) {
+        if (nextSymbol(grammar, oldItem) === getRuleName(grammar, item)) {
             append(S[i], { rule: oldItem.rule, next: oldItem.next + 1, start: oldItem.start });
         }
     }
@@ -222,14 +220,14 @@ function printS(S: EarleySet, grammar: Grammar): void {
         for (const st of S[i]) {
             pp.line();
             pp.col();
-            pp.write(name(grammar, st));
+            pp.write(getRuleName(grammar, st));
             pp.col();
             pp.write(' ->');
             for (let k = 0; k < Object.keys(grammar[st.rule]).length; k++) {
                 const symbol = (grammar[st.rule] as GrammarRule)[k];
                 if (k === st.next) pp.write(' •');
                 if (typeof symbol === 'string') pp.write(' ', symbol);
-                else if (typeof symbol === 'function') pp.write(' ', symbol());
+                else if (typeof symbol === 'function') pp.write(' ', symbol);
             }
             if (st.next > Object.keys(grammar[st.rule]).length - 1) pp.write(' •');
             pp.col();

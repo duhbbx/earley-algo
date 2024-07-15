@@ -1,12 +1,12 @@
 "use strict";
-// Usage: just execute `tsc recogniser.ts && node recogniser.js` in the command line.
 const earleyItem = (rule, next, start) => ({
     rule,
     next,
     start
 });
+// 这个是定义的规则
 const exampleGrammar = {
-    start_rule_name: 'Sum',
+    start_rule_name: 'Sum', // 起始的规则名称是 Sum
     0: { name: 'Sum', 0: 'Sum', 1: classSymbol('+-'), 2: 'Product' },
     1: { name: 'Sum', 0: 'Product' },
     2: { name: 'Product', 0: 'Product', 1: classSymbol('*/'), 2: 'Factor' },
@@ -33,7 +33,7 @@ function classSymbol(c) {
 function nextSymbol(grammar, item) {
     return grammar[item.rule][item.next];
 }
-function name(grammar, item) {
+function getRuleName(grammar, item) {
     return grammar[item.rule].name;
 }
 function equal(item1, item2) {
@@ -49,7 +49,7 @@ function append(set, item) {
 function complete(S, i, j, grammar) {
     const item = S[i][j];
     for (const oldItem of S[item.start]) {
-        if (nextSymbol(grammar, oldItem) === name(grammar, item)) {
+        if (nextSymbol(grammar, oldItem) === getRuleName(grammar, item)) {
             append(S[i], { rule: oldItem.rule, next: oldItem.next + 1, start: oldItem.start });
         }
     }
@@ -187,7 +187,7 @@ function printS(S, grammar) {
         for (const st of S[i]) {
             pp.line();
             pp.col();
-            pp.write(name(grammar, st));
+            pp.write(getRuleName(grammar, st));
             pp.col();
             pp.write(' ->');
             for (let k = 0; k < Object.keys(grammar[st.rule]).length; k++) {
@@ -197,7 +197,7 @@ function printS(S, grammar) {
                 if (typeof symbol === 'string')
                     pp.write(' ', symbol);
                 else if (typeof symbol === 'function')
-                    pp.write(' ', symbol());
+                    pp.write(' ', symbol);
             }
             if (st.next > Object.keys(grammar[st.rule]).length - 1)
                 pp.write(' •');
